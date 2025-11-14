@@ -2,10 +2,12 @@ export interface Episode {
 	id: string;
 	name: string;
 	description: string;
+	uri: string;
 }
 
 export interface EpisodeState {
 	current_episode_index: number;
+	current_episode_uri: string;
 	last_request_date: string | null;
 	last_time_period: string | null;
 	total_episodes_played: number;

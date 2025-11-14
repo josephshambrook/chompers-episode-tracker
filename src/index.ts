@@ -1,4 +1,14 @@
-import { Episode, EpisodeResult, RequestBody, SpotifyEpisodesResponse, SpotifyTokenCache, SpotifyTokenResponse } from './types';
+import { Buffer } from 'node:buffer';
+import { BLACKLISTED_EPISODES, CHOMPERS_SHOW_ID, TOTAL_EPISODES } from './const';
+import {
+	Episode,
+	EpisodeResult,
+	EpisodeState,
+	RequestBody,
+	SpotifyEpisodesResponse,
+	SpotifyTokenCache,
+	SpotifyTokenResponse,
+} from './types';
 
 export interface Env {
 	EPISODE_TRACKER: KVNamespace;
@@ -25,15 +35,6 @@ export default {
 		return new Response('Not Found', { status: 404 });
 	},
 };
-
-const TOTAL_EPISODES = 3565;
-const CHOMPERS_SHOW_ID = '21ASCcEXgUlbFSmoqjroZm';
-const BLACKLISTED_EPISODES: string[] = [
-	// Add episode IDs to skip here
-	'episode_id_1',
-	'episode_id_2',
-	// Add more as needed
-];
 
 async function handleNextEpisode(request: Request, env: Env): Promise<Response> {
 	try {
@@ -63,6 +64,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 			return new Response(
 				JSON.stringify({
 					episode_id: currentState.last_episode_id,
+					episode_uri: currentState.current_episode_uri,
 					episode_title: currentState.last_episode_title || 'Previous Episode',
 					replay: true,
 					episode_index: currentState.current_episode_index,
@@ -84,6 +86,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 
 		const newState: EpisodeState = {
 			current_episode_index: episodeResult.nextIndex,
+			current_episode_uri: episodeResult.episode.uri,
 			last_request_date: current_date,
 			last_time_period: time_period,
 			total_episodes_played: currentState.total_episodes_played + 1,
@@ -97,6 +100,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 			JSON.stringify({
 				episode_id: episodeResult.episode.id,
 				episode_title: episodeResult.episode.name,
+				episode_uri: episodeResult.episode.uri,
 				replay: false,
 				episode_index: episodeResult.nextIndex,
 				description: episodeResult.episode.description,
@@ -176,17 +180,29 @@ async function findNextValidEpisode(env: Env, currentIndex: number, timePeriod: 
 }
 
 function checkTimePeriodMatch(episodeTitle: string, requestedPeriod: string): boolean {
-	const hasNight = episodeTitle.includes('night');
-	const hasMorning = episodeTitle.includes('morning');
+	// Convert to lowercase for case-insensitive matching
+	const titleLower = episodeTitle.toLowerCase();
 
+	// Check for morning/night keywords (case-insensitive)
+	const hasNight = titleLower.includes('night');
+	const hasMorning = titleLower.includes('morning');
+
+	// If episode has neither "morning" nor "night", assume it's appropriate for any time
+	if (!hasMorning && !hasNight) {
+		return true;
+	}
+
+	// Skip if episode contains "morning" but user requested "pm"
 	if (hasMorning && requestedPeriod === 'pm') {
 		return false;
 	}
 
+	// Skip if episode contains "night" but user requested "am"
 	if (hasNight && requestedPeriod === 'am') {
 		return false;
 	}
 
+	// All other cases are valid
 	return true;
 }
 
