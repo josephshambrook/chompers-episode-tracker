@@ -68,6 +68,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 					episode_title: currentState.last_episode_title || 'Previous Episode',
 					replay: true,
 					episode_index: currentState.current_episode_index,
+					duration_ms: currentState.last_episode_duration_ms,
 				}),
 				{
 					headers: {
@@ -92,6 +93,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 			total_episodes_played: currentState.total_episodes_played + 1,
 			last_episode_id: episodeResult.episode.id,
 			last_episode_title: episodeResult.episode.name,
+			last_episode_duration_ms: episodeResult.episode.duration_ms,
 		};
 
 		await env.EPISODE_TRACKER.put(stateKey, JSON.stringify(newState));
@@ -104,6 +106,7 @@ async function handleNextEpisode(request: Request, env: Env): Promise<Response> 
 				replay: false,
 				episode_index: episodeResult.nextIndex,
 				description: episodeResult.episode.description,
+				duration_ms: episodeResult.episode.duration_ms,
 			}),
 			{
 				headers: {

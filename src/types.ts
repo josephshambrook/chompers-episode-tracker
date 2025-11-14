@@ -3,6 +3,7 @@ export interface Episode {
 	name: string;
 	description: string;
 	uri: string;
+	duration_ms: number;
 }
 
 export interface EpisodeState {
@@ -13,6 +14,7 @@ export interface EpisodeState {
 	total_episodes_played: number;
 	last_episode_id: string | null;
 	last_episode_title?: string;
+	last_episode_duration_ms?: number;
 }
 
 export interface EpisodeResult {
