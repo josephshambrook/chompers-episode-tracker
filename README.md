@@ -119,13 +119,24 @@ That's it. Your worker URL will be printed at the end.
 
 A [Bruno](https://www.usebruno.com/) collection is included in the [`bruno/`](bruno/) folder so you can make API calls without writing any code. Bruno is a free, open-source API client.
 
-1. [Download Bruno](https://www.usebruno.com/downloads)
-2. Open Bruno and click **Open Collection**, then select the `bruno/` folder from this repo
-3. Select an environment in the top-right — **Local** for `npm run dev`, or **Production** after deploying
-4. For Production, update the `baseUrl` in `bruno/environments/Production.bru` with your worker URL
-5. Open the **Next Episode** request and click **Send**
+### Setup
 
-The `current_date` field is auto-populated by a pre-request script, so you can just hit Send.
+1. [Download and install Bruno](https://www.usebruno.com/downloads)
+2. Open Bruno, click **Open Collection**, and select the `bruno/` folder from this repo
+
+### Choosing an environment
+
+The collection has two environments — select one from the dropdown in the top-right corner of Bruno:
+
+- **Local** — use this when running `npm run dev`. Points to `http://localhost:8787`
+- **Production** — use this after deploying to Cloudflare. Before using it, open `bruno/environments/Production.bru` and replace the `baseUrl` value with your worker URL (printed at the end of `npm run deploy`)
+
+### Making a request
+
+1. Select the **Next Episode** request in the left sidebar
+2. Check the request body — `time_period` is set to `"am"` by default, change it to `"pm"` if you want a night episode
+3. Click **Send** — `current_date` is filled in automatically for you
+4. The response will show the next episode to play, including its Spotify URI, title, and duration
 
 ## Local Development
 
