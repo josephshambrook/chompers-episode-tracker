@@ -1,0 +1,34 @@
+meta {
+  name: Next Episode
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/next-episode
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "time_period": "am",
+    "current_date": "{{today}}"
+  }
+}
+
+script:pre-request {
+  const today = new Date().toISOString().split('T')[0];
+  bru.setVar('today', today);
+}
+
+docs {
+  ## Next Episode
+
+  Returns the next episode to play based on the time of day.
+
+  **time_period**: `am` or `pm`
+  **current_date**: today's date in `YYYY-MM-DD` format (auto-populated by the pre-request script)
+
+  If the same `time_period` and `current_date` are sent more than once, the same episode is returned (`"replay": true`).
+}

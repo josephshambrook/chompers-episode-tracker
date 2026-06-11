@@ -79,7 +79,16 @@ npm install
 npx wrangler kv namespace create EPISODE_TRACKER
 ```
 
-This prints an ID — paste it into `wrangler.jsonc` replacing the existing `id` value.
+Wrangler will ask if you want it to update `wrangler.jsonc` automatically — choose **No**. Then manually replace the `id` value in `wrangler.jsonc` with the ID printed in the output:
+
+```jsonc
+"kv_namespaces": [
+  {
+    "binding": "EPISODE_TRACKER",
+    "id": "your-new-id-here"  // replace this
+  }
+]
+```
 
 ### 5. Set up local credentials
 
@@ -105,6 +114,18 @@ npm run deploy
 ```
 
 That's it. Your worker URL will be printed at the end.
+
+## Trying the API with Bruno
+
+A [Bruno](https://www.usebruno.com/) collection is included in the [`bruno/`](bruno/) folder so you can make API calls without writing any code. Bruno is a free, open-source API client.
+
+1. [Download Bruno](https://www.usebruno.com/downloads)
+2. Open Bruno and click **Open Collection**, then select the `bruno/` folder from this repo
+3. Select an environment in the top-right — **Local** for `npm run dev`, or **Production** after deploying
+4. For Production, update the `baseUrl` in `bruno/environments/Production.bru` with your worker URL
+5. Open the **Next Episode** request and click **Send**
+
+The `current_date` field is auto-populated by a pre-request script, so you can just hit Send.
 
 ## Local Development
 
