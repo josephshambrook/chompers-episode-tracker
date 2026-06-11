@@ -22,7 +22,11 @@ const mockEpisode = {
 
 beforeEach(async () => {
 	await env.EPISODE_TRACKER.delete('episode_state');
-	await env.EPISODE_TRACKER.delete('spotify_token');
+	// Pre-seed a non-expired token so tests never need to mock the token fetch
+	await env.EPISODE_TRACKER.put(
+		'spotify_token',
+		JSON.stringify({ access_token: 'test-token', expires_at: Date.now() + 60 * 60 * 1000 })
+	);
 });
 
 describe('OPTIONS', () => {
@@ -69,11 +73,6 @@ describe('POST /next-episode', () => {
 			})
 		);
 
-		// Mock Spotify so the worker doesn't make real network calls
-		vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-			new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 }))
-		);
-
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(makeRequest({ time_period: 'am', current_date: '2025-01-01' }), env, ctx);
 		await waitOnExecutionContext(ctx);
@@ -98,10 +97,7 @@ describe('POST /next-episode', () => {
 		);
 
 		vi.spyOn(globalThis, 'fetch')
-			.mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 })))
-			.mockResolvedValueOnce(
-				new Response(JSON.stringify({ items: [mockEpisode] }))
-			);
+			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [mockEpisode] })));
 
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(makeRequest({ time_period: 'am', current_date: '2025-01-02' }), env, ctx);
@@ -119,9 +115,7 @@ describe('POST /next-episode', () => {
 		const genericEpisode = { ...mockEpisode, id: 'generic1', name: 'Fun Facts About Sharks' };
 
 		vi.spyOn(globalThis, 'fetch')
-			.mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 })))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [nightEpisode] })))
-			.mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 })))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [genericEpisode] })));
 
 		const ctx = createExecutionContext();
@@ -138,9 +132,7 @@ describe('POST /next-episode', () => {
 		const genericEpisode = { ...mockEpisode, id: 'generic1', name: 'Fun Facts About Sharks' };
 
 		vi.spyOn(globalThis, 'fetch')
-			.mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 })))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [morningEpisode] })))
-			.mockResolvedValueOnce(new Response(JSON.stringify({ access_token: 'token', expires_in: 3600 })))
 			.mockResolvedValueOnce(new Response(JSON.stringify({ items: [genericEpisode] })));
 
 		const ctx = createExecutionContext();
