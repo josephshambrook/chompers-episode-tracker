@@ -1,6 +1,6 @@
 # Chompers Episode Tracker
 
-A Cloudflare Workers API for tracking and serving episodes from the [Chompers](https://open.spotify.com/show/21ASCcEXgUlbFSmoqjroZm) podcast. Chompers is a kids' podcast that guides children through brushing their teeth with fun themed episodes. The podcast stopped production in July 2023, so this API picks up where it left off — keeping the habit going by serving episodes sequentially, one per brushing session.
+A Cloudflare Workers API for tracking and serving episodes from the [Chompers](https://open.spotify.com/show/21ASCcEXgUlbFSmoqjroZm) podcast. Chompers is a kids' podcast that guides children through brushing their teeth with fun themed episodes. The podcast stopped production in July 2023, so this API picks up where it left off - keeping the habit going by serving episodes sequentially, one per brushing session.
 
 **Fully free to run.** This uses Cloudflare Workers and KV on the free tier, and the Spotify API with no premium account required.
 
@@ -70,6 +70,8 @@ Sign up at [cloudflare.com](https://cloudflare.com) if you don't have an account
 ```bash
 git clone https://github.com/yourusername/chompers-episode-tracker.git
 cd chompers-episode-tracker
+# check you are using the right version of node first
+# if you have nvm, you can run `nvm use` to pick it up
 npm install
 ```
 
